@@ -1,33 +1,36 @@
-
 const http = require('http');
 const path = require('path');
 const express = require('express');
-const urlUtil = require('url');
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const bodyParser = require('body-parser');
 const extName = require('ext-name');
+const fetch = require('node-fetch');
+const FileReader = require('filereader');
+
 const { TextractClient, AnalyzeDocumentCommand } = require("@aws-sdk/client-textract");
 const client = new TextractClient({region: 'us-east-1'});
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.post('/sms', (req, res) => {
+app.post('/sms', async(req, res) => {
     const { body } = req;
     const { NumMedia, From: SenderNumber, MessageSid } = body;
-    const mediaItems = [];
-
-    for (var i = 0; i < NumMedia; i++) {  // eslint-disable-line
+    let reader = new FileReader();
+    for (let i = 0; i < NumMedia; i++) {  // eslint-disable-line
+        let data = [];
         const mediaUrl = body[`MediaUrl${i}`];
-
         const contentType = body[`MediaContentType${i}`];
         const extension = extName.mime(contentType)[0].ext;
     
         if(extension === 'jpeg' || extension === 'png'){
-            const mediaSid = path.basename(urlUtil.parse(mediaUrl).pathname);
-            const filename = `${mediaSid}.${extension}`;
-
-            mediaItems.push({ mediaSid, MessageSid, mediaUrl, filename });
+            let response = await fetch(mediaUrl).then(response => response.blob()).then(imageBlob => URL.createObjectURL(imageBlob));
+            console.log(response);
+            reader.readAsDataURL(response); 
+            reader.onloadend = function() {
+                var base64data = reader.result;                
+                console.log(base64data);
+            }
         }
     }
 
