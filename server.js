@@ -40,14 +40,13 @@ async function SaveMedia(mediaItem) {
     const { mediaUrl, extension } = mediaItem;
     const fullPath = path.resolve(`${PUBLIC_DIR}/image${++image_index}.${extension}`);
 
-    if (!fs.existsSync(fullPath)) {
-        const response = await fetch(mediaUrl);
-        const fileStream = fs.createWriteStream(fullPath);
+    const response = await fetch(mediaUrl);
+    const fileStream = fs.createWriteStream(fullPath);
 
-        response.body.pipe(fileStream);
+    response.body.pipe(fileStream);
 
-        deleteMediaItem(mediaItem);
-    }
+    deleteMediaItem(mediaItem);
+    
 
     images.push(`image${image_index}.${extension}`);
   }
@@ -85,7 +84,7 @@ app.post('/sms', async(req, res) => {
         let params = {Document: {Bytes: fs.readFileSync(`${PUBLIC_DIR}/${images[i]}`)}, FeatureTypes: ['TABLES']};
         const request = textract.analyzeDocument(params);
         const data = await request.promise();
-        
+
     }
 
     const messageBody = NumMedia === 0 ?
