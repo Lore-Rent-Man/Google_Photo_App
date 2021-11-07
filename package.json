@@ -9,6 +9,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "child_process": "^1.0.2"
+    "aws-sdk": "^2.1023.0",
+    "child_process": "^1.0.2",
+    "express": "^4.17.1",
+    "ext-name": "^5.0.0",
+    "lodash": "^4.17.21",
+    "node-fetch": "^2.6.6",
+    "twilio": "^3.71.1"
   }
 }
